@@ -26,7 +26,57 @@ hbs.registerHelper("ifEquals", (arg1, arg2, options) => {
     return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
 })
 
+app.get("/registration", async (req, res) => {
+    try {
+        res.render("registration.hbs");
+    } catch (error) {
+        console.log(error);
+    }
+})
 
+app.get("/login", async (req, res) => {
+    try {
+
+        res.render("login.hbs")
+
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+app.post("/enterUser", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const [user] = await promisePool.execute("SELECT * FROM `users` WHERE email = ?", [email]);
+
+        if (user.length > 0) {
+
+            res.sendStatus(200);
+        }
+    } catch (error) {
+
+    }
+})
+
+app.post("/createUser", async (req, res) => {
+    try {
+        const { login, email, password } = req.body;
+
+        const [duplicateUser] = await promisePool.execute("SELECT * FROM `users` WHERE `Email` = ?", [email]);
+
+        if (duplicateUser.length === 0) {
+            const [user] = await promisePool.execute("INSERT INTO `users` (`login`, `email`, `password`) VALUES (?,?,?)", [login, email, password]);
+            console.log(user);
+            res.sendStatus(200);
+        }
+        else {
+            res.render(500);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 app.get("/services", async (req, res) => {
     try {
@@ -53,7 +103,7 @@ app.get("/service/:name", async (req, res) => {
 app.get("/tablesName", async (req, res) => {
     try {
         const [names] = await promisePool.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'bppppvfgvsskvuc87ysa'");
-        
+
         res.render("admin.hbs", {
             names
         });
