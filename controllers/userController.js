@@ -26,7 +26,7 @@ exports.profile = async (req, res) => {
         const { email } = req.params;
 
         if (email === "null") {
-            res.redirect("/registration")
+            res.redirect("../registration")
         } else {
             const user = new User(null, null, email);
             const response = await user.select();
