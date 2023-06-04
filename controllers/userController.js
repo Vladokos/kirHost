@@ -44,9 +44,9 @@ exports.profile = async (req, res) => {
 
 exports.enterUser = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, password } = req.body;
 
-        const user = new User(null, null, email);
+        const user = new User(null, null, email, password);
         const response = await user.select()
 
         if (response.length > 0) {

@@ -27,10 +27,13 @@ module.exports = class User {
 
     async select() {
         let user;
-        
+
         if (this.idUsers) {
             [user] = await db.execute("SELECT * FROM `users` WHERE `idusers` = ?", [this.idUsers]);
-        } else {
+        } else if (this.password) {
+            [user] = await db.execute("SELECT * FROM `users` WHERE `Email` = ? AND `password` = ?", [this.email, this.password]);
+        }
+        else {
             [user] = await db.execute("SELECT * FROM `users` WHERE `Email` = ?", [this.email]);
         }
         return user;
