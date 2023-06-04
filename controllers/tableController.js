@@ -28,6 +28,11 @@ exports.selectTableDataColumns = async (req, res) => {
             if (data[i]?.Image) {
                 data[i].Image = "data:image/png;base64," + Buffer.from(data[i].Image).toString("base64")
             }
+            if (data[i]?.Date) {
+                const date = new Date(data[i].Date)
+                const formatted = new Intl.DateTimeFormat('en-US').format(date);
+                data[i].Date = formatted;
+            }
         }
 
         const colum = columns.map((column) => column.COLUMN_NAME);
@@ -192,7 +197,7 @@ exports.deleteData = async (req, res) => {
             `${id}`;
 
         const [data] = await db.execute(query);
-        
+
         res.sendStatus(200);
         // pool.getConnection((err, connection) => {
         //     connection.query(query, (err, respond, fields) => {
