@@ -3,7 +3,7 @@ const serviceController = require("../controllers/serviceController");
 const serviceRouter = express.Router();
 
 serviceRouter.get("/allService", serviceController.allService);
-serviceRouter.get("/service/:id", serviceController.service);
+serviceRouter.get("/:id", serviceController.service);
 
 module.exports = serviceRouter;
 
