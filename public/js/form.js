@@ -16,6 +16,8 @@ log?.addEventListener("click", () => {
                 localStorage.setItem("user", email.value)
                 window.location.href = "https://kirhost.onrender.com/";
             }
+        }).catch(err => {
+            alert("Введите правильный логин и пароль")
         })
     } else {
         alert("Заполните поля");
