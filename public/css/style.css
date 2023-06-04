@@ -320,6 +320,19 @@ body {
   color: #ea3454;
 }
 
+.allService {
+  display: block;
+  text-align: center;
+
+  padding-bottom: 50px;
+
+  transition: 0.15s all linear;
+
+}
+.allService:hover {
+  color: #ea3454;
+}
+
 /* ----------section offers end---------- */
 /* ----------section advantages start---------- */
 
@@ -589,7 +602,6 @@ body {
 
   transition: 0.6s cubic-bezier(0.65, 0, 0.35, 1);
 
-
   position: fixed;
   z-index: 2;
   top: 0;
@@ -672,7 +684,6 @@ body {
   top: -500px;
   left: 222px;
 
-
   font-family: Montserrat;
   font-size: 18px;
   color: #000;
@@ -684,7 +695,6 @@ body {
 
 .popup__inner .close:hover {
   color: #000;
- 
 }
 
 /* ----------footer end---------- */

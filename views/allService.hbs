@@ -17,20 +17,17 @@
     <main>
         <div class="container">
             <div class="main__inner">
-                <ul>
+                <div class="offers_list">
                     {{#each services}}
-                    <li>
-                        <a href="/service/{{this.idServices}}">
-                            <div>
-                                <img src="{{this.Image}}">
-                            </div>
-                            <h1>{{this.Title}}</h1>
+                    <div class="offer offer_content">
+                        <a href="../service/{{this.idServices}}" target="_blank" class="offer_title">
+                            <img class="offer_image" src="{{this.Image}}" alt="Компьютерная диагностика" />
+                            {{this.Title}}
                         </a>
-                    </li>
+                    </div>
                     {{/each}}
-                </ul>
+                </div>
             </div>
-        </div>
     </main>
     {{> footer}}
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></scrip >
