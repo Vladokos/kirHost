@@ -30,7 +30,7 @@ exports.selectTableDataColumns = async (req, res) => {
             }
             if (data[i]?.Date) {
                 const date = new Date(data[i].Date)
-                const formatted = new Intl.DateTimeFormat('en-US').format(date);
+                const formatted = new Intl.DateTimeFormat('en-US').format(date).split("/").reverse().join("-");
                 data[i].Date = formatted;
             }
         }
@@ -70,14 +70,16 @@ exports.addData = async (req, res) => {
             if (i + 1 < columnsName.length) {
                 if (columnsName[i] === "`Image`") {
                     bufferValue = Buffer.from(data[i], "base64");
-                    set += `BINARY(:bufferValue)` + ",";
+                    // set += `BINARY(:bufferValue)` + ",";
+                    set += `?` + ",";
                 } else {
                     set += data[i] + ",";
                 }
             } else {
                 if (columnsName[i] === "`Image`") {
                     bufferValue = Buffer.from(data[i], "base64");
-                    set += `BINARY(:bufferValue)`;
+                    // set += `BINARY(:bufferValue)`;
+                    set += `?`;
                 } else {
                     set += data[i];
                 }
@@ -94,7 +96,7 @@ exports.addData = async (req, res) => {
             set +
             ")";
 
-        await db.execute(query);
+        await db.execute(query, [bufferValue]);
 
         res.sendStatus(200);
 
@@ -135,14 +137,16 @@ exports.changeData = async (req, res) => {
             if (i + 1 < columnsName.length) {
                 if (columnsName[i] === "`Image`") {
                     bufferValue = Buffer.from(data[i], "base64");
-                    set += columnsName[i] + "=" + `BINARY(:bufferValue)` + ",";
+                    // set += columnsName[i] + "=" + `BINARY(:bufferValue)` + ",";
+                    set += columnsName[i] + "=" + `?` + ",";
                 } else {
                     set += columnsName[i] + "=" + data[i] + ",";
                 }
             } else {
                 if (columnsName[i] === "`Image`") {
                     bufferValue = Buffer.from(data[i], "base64");
-                    set += columnsName[i] + "=" + `BINARY(:bufferValue)`;
+                    // set += columnsName[i] + "=" + `BINARY(:bufferValue)`;
+                    set += columnsName[i] + "=" + `?`;
                 } else {
                     set += columnsName[i] + "=" + data[i];
                 }
@@ -159,7 +163,7 @@ exports.changeData = async (req, res) => {
             "`" +
             "=" +
             `'${id}'`;
-        await db.execute(query);
+        await db.execute(query,[bufferValue]);
         res.sendStatus(200);
 
         // pool.getConnection((err, connection) => {

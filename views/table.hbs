@@ -36,6 +36,14 @@
         </div>
         <div class="actions">
           {{#each columnsDataType as |column|}}
+          {{#ifEquals column.COLUMN_NAME 'primaryKey'}}
+
+          <div class="actions_inner" style="visibility: hidden; position:absolute; left:0px; width:0px;">
+            <span class="inner_span">{{column.COLUMN_NAME}}</span>
+            <input type="text" id="{{column.COLUMN_NAME}}" onkeypress="return isNumberKey(event)">
+          </div>
+
+          {{else}}
           {{#ifEquals column.COLUMN_NAME "Image"}}
           <div for="file" class="btn_image" onclick="document.getElementById('{{column.COLUMN_NAME}}').click();">
             <span class="inner_span">Выберите картинку</span>
@@ -55,6 +63,8 @@
           {{/ifEquals}}
 
           {{/ifEquals }}
+
+          {{/ifEquals}}
           {{/each}}
           <div class="actions_inner">
             <button id="save" name="{{tableName}}/{{primaryKey}}">Сохранить</button>
