@@ -1,0 +1,62 @@
+<header class="header">
+  <div class="header_container">
+    <div class="header_menu" id="menu">
+      <nav class="menu_nav">
+        <ul class="nav_items">
+          <li>
+            <a href="https://kirc.onrender.com#offers" class="js-scroll">Услуги</a>
+          </li>
+          <li>
+            <a href="https://kirc.onrender.com#advantages" class="js-scroll">Преимущества</a>
+          </li>
+          <li>
+            <a href="https://kirc.onrender.com#models" class="js-scroll">Марки</a>
+          </li>
+          <li>
+            <a href="https://kirc.onrender.com#footer" class="js-scroll">Контакты</a>
+          </li>
+          <li>
+            <a href="https://kirhost.onrender.com/users/profile" id="profile" class="js-scroll">Профиль</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <a href="http://localhost:5500/client/"><img src="../../images/logo.png" alt="Логотип автосервиса" class="logo" /></a>
+
+    <nav class="navigation">
+      <ul class="navigation_items">
+        <li><a href="https://kirc.onrender.com#offers" class="item-link js-scroll">Услуги</a></li>
+        <li>
+          <a href="https://kirc.onrender.com#advantages" class="item-link js-scroll">Преимущества</a>
+        </li>
+        <li><a href="https://kirc.onrender.com#models" class="item-link js-scroll">Марки</a></li>
+        <li><a href="https://kirc.onrender.com#footer" class="item-link js-scroll">Контакты</a></li>
+        <li>
+          <a href="https://kirhost.onrender.com/users/profile" class="item-link js-scroll" id="profile2">Профиль</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="burger" id="burger">
+      <div class="burger_line burger_line-first"></div>
+      <div class="burger_line burger_line-second"></div>
+      <div class="burger_line burger_line-third"></div>
+      <div class="burger_line burger_line-fourth"></div>
+    </div>
+  </div>
+</header>
+<script>
+  const id = localStorage.getItem("user");
+
+  const link = document.getElementById("profile");
+  const link2 = document.getElementById("profile2");
+  link.setAttribute(
+    "href",
+    `https://kirhost.onrender.com/users/profile/${id}`
+  );
+  link2.setAttribute(
+    "href",
+    `https://kirhost.onrender.com/users/profile/${id}`
+  );
+</script>

@@ -3,298 +3,33 @@ const app = express();
 const cors = require("cors");
 const hbs = require("hbs");
 
-const mysql = require("mysql2");
+
+const userRouter = require("./routes/user.js")
+const orderRouter = require("./routes/order.js");
+const serviceRouter = require("./routes/service.js");
+const tableRouter = require("./routes/table.js");
+
 
 app.use(cors());
 app.use(express.json());
+
 app.use(express.static(__dirname + '/public'));
+hbs.registerPartials(__dirname + "/views/partials/");
+
+
 
 app.set("view engine", "hbs");
 
-const pool = mysql.createPool({
-    host: "bppppvfgvsskvuc87ysa-mysql.services.clever-cloud.com",
-    user: "ueq7frirowmonxtz",
-    database: "bppppvfgvsskvuc87ysa",
-    password: "gJrysJIaW54CIHDfQnZh",
-    port: "3306",
-});
-
-const promisePool = pool.promise();
 
 hbs.registerHelper("ifEquals", (arg1, arg2, options) => {
-
     return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
 })
 
-app.get("/registration", async (req, res) => {
-    try {
-        res.render("registration.hbs");
-    } catch (error) {
-        console.log(error);
-    }
-})
 
-app.get("/login", async (req, res) => {
-    try {
-
-        res.render("login.hbs")
-
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-app.post("/enterUser", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        const [user] = await promisePool.execute("SELECT * FROM `users` WHERE email = ?", [email]);
-
-        if (user.length > 0) {
-
-            res.sendStatus(200);
-        }
-    } catch (error) {
-
-    }
-})
-
-app.post("/createUser", async (req, res) => {
-    try {
-        const { login, email, password } = req.body;
-
-        const [duplicateUser] = await promisePool.execute("SELECT * FROM `users` WHERE `Email` = ?", [email]);
-
-        if (duplicateUser.length === 0) {
-            const [user] = await promisePool.execute("INSERT INTO `users` (`login`, `email`, `password`) VALUES (?,?,?)", [login, email, password]);
-            console.log(user);
-            res.sendStatus(200);
-        }
-        else {
-            res.render(500);
-        }
-    } catch (error) {
-        console.log(error);
-    }
-});
-
-app.get("/services", async (req, res) => {
-    try {
-        const [services] = await promisePool.execute("SELECT * FROM `Services`");
-
-        res.send(services).status(200);
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-app.get("/service/:name", async (req, res) => {
-    try {
-        const { name } = req.params;
-
-        const [service] = await promisePool.execute("SELECT * FROM `Services` WHERE Title = ?", [name.trim()])
-
-        res.send(service).status(200);
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-app.get("/tablesName", async (req, res) => {
-    try {
-        const [names] = await promisePool.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'bppppvfgvsskvuc87ysa'");
-
-        res.render("admin.hbs", {
-            names
-        });
-    } catch (error) {
-
-    }
-});
-
-app.get("/tableColumns/:name", async (req, res) => {
-    try {
-        const { name } = req.params;
-
-        const [columns] = await promisePool.execute("SELECT COLUMN_NAME, COLUMN_KEY, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?", [name]);
-
-        const [data] = await promisePool.execute("SELECT * FROM `" + name + "`");
-
-
-        for (let i = 0; i < data.length; i++) {
-            if (data[i]?.Image) {
-                data[i].Image = "data:image/png;base64," + Buffer.from(data[i].Image).toString("base64")
-            }
-        }
-
-        // console.log(columns);
-
-        const colum = columns.map((column) => column.COLUMN_NAME);
-        const primaryKey = columns.find((colum) => { if (colum.COLUMN_KEY === 'PRI') { return colum } }).COLUMN_NAME
-
-        res.render("table.hbs", {
-            columns: colum,
-            columnsDataType: columns,
-            data: data,
-            tableName: name,
-            primaryKey
-        });
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-app.post("/tableAdd/:name", async (req, res) => {
-    try {
-        const { name } = req.params;
-
-        let { data, columnsName } = req.body;
-
-        columnsName = columnsName.map((name) => "`" + name + "`");
-        data = data.map((value) => `'${value}'`);
-
-        let set = " ";
-
-        let bufferValue;
-
-        for (let i = 0; i < columnsName.length; i++) {
-            if (i + 1 < columnsName.length) {
-                if (columnsName[i] === "`Image`") {
-                    bufferValue = Buffer.from(data[i], "base64");
-                    set += `BINARY(:bufferValue)` + ",";
-                } else {
-                    set += data[i] + ",";
-                }
-            } else {
-                if (columnsName[i] === "`Image`") {
-                    bufferValue = Buffer.from(data[i], "base64");
-                    set += `BINARY(:bufferValue)`;
-                } else {
-                    set += data[i];
-                }
-            }
-        }
-
-
-        const query =
-            "INSERT INTO " +
-            name +
-            "(" +
-            columnsName.join(",") +
-            ") VALUES(" +
-            set +
-            ")";
-
-        pool.getConnection((err, connection) => {
-            connection.query(query, { bufferValue }, (err, respond, fields) => {
-                if (!respond) {
-                    res.sendStatus(304);
-
-                } else {
-                    res.sendStatus(200);
-                }
-                pool.releaseConnection(connection);
-            });
-        });
-
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-app.post("/tableChangeData/:name", async (req, res) => {
-    try {
-        const { name } = req.params;
-
-        let { columnsName, data, field, id } = req.body;
-
-        columnsName = columnsName.map((name) => "`" + name + "`");
-        data = data.map((value) => `'${value}'`);
-
-        let set = " SET ";
-
-        let bufferValue;
-
-        for (let i = 0; i < columnsName.length; i++) {
-            if (i + 1 < columnsName.length) {
-                if (columnsName[i] === "`Image`") {
-                    bufferValue = Buffer.from(data[i], "base64");
-                    set += columnsName[i] + "=" + `BINARY(:bufferValue)` + ",";
-                } else {
-                    set += columnsName[i] + "=" + data[i] + ",";
-                }
-            } else {
-                if (columnsName[i] === "`Image`") {
-                    bufferValue = Buffer.from(data[i], "base64");
-                    set += columnsName[i] + "=" + `BINARY(:bufferValue)`;
-                } else {
-                    set += columnsName[i] + "=" + data[i];
-                }
-            }
-        }
-
-        const query =
-            "UPDATE " +
-            name +
-            set +
-            " WHERE " +
-            "`" +
-            `${field}` +
-            "`" +
-            "=" +
-            `'${id}'`;
-        pool.getConnection((err, connection) => {
-            connection.query(query, { bufferValue }, (err, respond, fields) => {
-                if (err) throw err;
-                if (respond.affectedRows === 0) {
-                    res.sendStatus(404)
-                } else {
-                    res.sendStatus(200);
-                }
-                pool.releaseConnection(connection);
-            });
-        });
-
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
-});
-
-app.post("/tableDeleteData/:name", async (req, res) => {
-    try {
-        const { name } = req.params;
-
-        const { field, id } = req.body;
-
-        const query =
-            "DELETE FROM " +
-            name +
-            " WHERE " +
-            "`" +
-            `${field}` +
-            "`" +
-            "=" +
-            `${id}`;
-        pool.getConnection((err, connection) => {
-            connection.query(query, (err, respond, fields) => {
-                if (err) {
-                    // console.log(err);
-                    res.sendStatus(304);
-                } else {
-                    res.sendStatus(200);
-                }
-                pool.releaseConnection(connection);
-            });
-        });
-
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
-});
-
-
+app.use("/users", userRouter);
+app.use("/order", orderRouter);
+app.use("/service", serviceRouter)
+app.use("/table", tableRouter)
 
 
 

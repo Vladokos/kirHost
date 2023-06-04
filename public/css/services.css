@@ -1,0 +1,10 @@
+ul {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+main{
+    margin-top: 200px;
+    margin-bottom: 200px;
+}

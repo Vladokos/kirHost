@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../css/reset.css">
+    <link rel="stylesheet" href="../../css/fonts.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/profile.css">
+
+    <script>
+        const user = localStorage.getItem("user");
+        if (!user) {
+            window.location.replace('https://kirhost.onrender.com/users/registration');
+
+        } else {
+            const link = window.location.href.split("/");
+
+            if (user !== link[link.length - 1]) {
+                window.location.replace('https://kirhost.onrender.com/users/registration');
+            }
+        }
+    </script>
+
+</head>
+
+<body>
+    {{> header}}
+    <main>
+        <div class="data">
+            <div class="container">
+                <div class="data__inner">
+                    <div class="leftSide">
+                        {{#each user}}
+                        <span>Логин</span>
+                        <input type="text" value="{{this.login}}" readonly >
+                        <span>Почта</span>
+                        <input type="text" value="{{this.email}}" readonly >
+                        {{/each}}
+                        <button
+                            onclick="localStorage.clear();  window.location.replace('https://kirc.onrender.com/');">Выйти</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+    {{> footer}}
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></scrip >
+</body >
+
+</html >

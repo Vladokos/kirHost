@@ -60,7 +60,7 @@ saveButton.addEventListener("click", async (e) => {
         }
     }
 
-    axios.post(`/tableAdd/${tableName}`, {
+    axios.post(`/table/tableAdd/${tableName}`, {
         data,
         columnsName
     }).then((res) => {
@@ -112,7 +112,7 @@ changeButton.addEventListener("click", async (e) => {
         }
     }
     
-    axios.post(`/tableChangeData/${tableName}`, {
+    axios.post(`/table/tableChangeData/${tableName}`, {
         columnsName,
         data,
         field: primaryKey,
@@ -136,7 +136,7 @@ deleteButton.addEventListener("click", (e) => {
     const id = document.getElementById(primaryKey).value;
 
     if (id.length > 0) {
-        axios.post(`/tableDeleteData/${tableName}`, {
+        axios.post(`/table/tableDeleteData/${tableName}`, {
             field: primaryKey,
             id
         }).then(res => {
