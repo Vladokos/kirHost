@@ -21,7 +21,7 @@ module.exports = class Services {
     }
 
     async select() {
-        const [data] = await db.execute("SELECT * FROM `Services` WHERE idServices = ?", [idServices]);
+        const [data] = await db.execute("SELECT * FROM `Services` WHERE idServices = ?", [this.idServices]);
 
         if (data[0]?.Image) {
             data[0].Image = "data:image/png;base64," + Buffer.from(data[0].Image).toString("base64")

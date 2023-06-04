@@ -19,7 +19,7 @@ exports.allService = async (req, res) => {
 exports.service = async (req, res) => {
     try {
         const { id } = req.params;
-
+        console.log(id);
         const service = new Services(id);
         const data = await service.select();
 

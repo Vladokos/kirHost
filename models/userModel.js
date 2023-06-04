@@ -9,12 +9,12 @@ module.exports = class User {
     }
 
     async create() {
-        const [duplicateUser] = await db.execute("SELECT * FROM `users` WHERE `Email` = ?", [email]);
+        const [duplicateUser] = await db.execute("SELECT * FROM `users` WHERE `Email` = ?", [this.email]);
 
         let status = 500;
 
         if (duplicateUser.length === 0) {
-            const [user] = await db.execute("INSERT INTO `users` (`login`, `email`, `password`) VALUES (?,?,?)", [login, email, password]);
+            const [user] = await db.execute("INSERT INTO `users` (`login`, `email`, `password`) VALUES (?,?,?)", [this.login, this.email, this.password]);
 
             status = 200;
         }
@@ -28,10 +28,10 @@ module.exports = class User {
     async select() {
         let user;
         
-        if (idUsers) {
-            [user] = await db.execute("SELECT * FROM `users` WHERE `idusers` = ?", [idUsers]);
+        if (this.idUsers) {
+            [user] = await db.execute("SELECT * FROM `users` WHERE `idusers` = ?", [this.idUsers]);
         } else {
-            [user] = await db.execute("SELECT * FROM `users` WHERE `Email` = ?", [email]);
+            [user] = await db.execute("SELECT * FROM `users` WHERE `Email` = ?", [this.email]);
         }
         return user;
     }

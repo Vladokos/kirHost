@@ -17,8 +17,8 @@ module.exports = class Order {
 
         let service;
 
-        if (idOrder) {
-            [service] = await db.execute("select * from `Services` where `idServices` = ?", [idOrder]);
+        if (this.idOrder) {
+            [service] = await db.execute("select * from `Services` where `idServices` = ?", [this.idOrder]);
         } else {
             [service] = await db.execute("select * from `Services` limit 1");
         }
