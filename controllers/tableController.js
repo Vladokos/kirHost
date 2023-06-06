@@ -1,12 +1,22 @@
 const db = require("../util/database");
 
-
+const translateTableName = {
+    'users': 'Пользователи',
+    'Order': 'Заявки',
+    'Services': 'Услуги',
+}
 exports.selectTablesName = async (req, res) => {
     try {
-        const [names] = await db.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'bppppvfgvsskvuc87ysa'");
+        const [names] = await db.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'boeejsqyv4gxfs7gshhn'");
+
+        for (let i = 0; i < names.length; i++) {
+
+            names[i].TABLE_NAME = translateTableName[names[i].TABLE_NAME];
+        }
+
 
         res.render("admin.hbs", {
-            names
+            names: translateTableName,
         });
     } catch (error) {
         console.log(error);
@@ -14,7 +24,27 @@ exports.selectTablesName = async (req, res) => {
         return res.sendStatus(500);
     }
 }
+const usersTranslate = {
+    "Почта": "email",
+    "Номер пользователя": "idusers",
+    "Логин": "login",
+    "Пароль": "password"
+}
 
+const serviceTranslitiion = {
+    "Номер типа услуги": "idServices",
+    "Название": "Title",
+    "Изображение": "Image",
+    "Описание": "Description"
+}
+
+const orderTranslate = {
+    "Номер заказа": "idOrder",
+    "Номер услуги": "idService",
+    "Номер пользователя": "idUser",
+    "Дата": "Date",
+
+}
 exports.selectTableDataColumns = async (req, res) => {
     try {
         const { name } = req.params;
@@ -35,9 +65,33 @@ exports.selectTableDataColumns = async (req, res) => {
             }
         }
 
-        const colum = columns.map((column) => column.COLUMN_NAME);
-        const primaryKey = columns.find((colum) => { if (colum.COLUMN_KEY === 'PRI') { return colum } }).COLUMN_NAME
+        let colum = columns.map((column) => column.COLUMN_NAME);
 
+        switch (name) {
+            case "users":
+                colum = usersTranslate;
+                for (let i = 0; i < columns.length; i++) {
+                    columns[i].COLUMN_NAME = Object.keys(usersTranslate).find(key => usersTranslate[key] === columns[i].COLUMN_NAME);
+                }
+                break;
+            case "Services":
+                colum = serviceTranslitiion;
+                for (let i = 0; i < columns.length; i++) {
+                    columns[i].COLUMN_NAME = Object.keys(serviceTranslitiion).find(key => serviceTranslitiion[key] === columns[i].COLUMN_NAME);
+                }
+                break;
+            case "Order":
+                colum = orderTranslate;
+                for (let i = 0; i < columns.length; i++) {
+                    columns[i].COLUMN_NAME = Object.keys(orderTranslate).find(key => orderTranslate[key] === columns[i].COLUMN_NAME);
+                }
+                break;
+            default:
+                break;
+        }
+
+        const primaryKey = columns.find((colum) => { if (colum.COLUMN_KEY === 'PRI') { return colum } }).COLUMN_NAME
+        // console.log(colum);
         res.render("table.hbs", {
             columns: colum,
             columnsDataType: columns,
@@ -58,6 +112,30 @@ exports.addData = async (req, res) => {
         const { name } = req.params;
 
         let { data, columnsName } = req.body;
+
+
+        switch (name) {
+            case "users":
+                for (let i = 0; i < columnsName.length; i++) {
+
+                    columnsName[i] = usersTranslate[columnsName[i]];
+                }
+                break;
+            case "Services":
+                for (let i = 0; i < columnsName.length; i++) {
+
+                    columnsName[i] = serviceTranslitiion[columnsName[i]];
+                }
+                break;
+            case "Order":
+                for (let i = 0; i < columnsName.length; i++) {
+
+                    columnsName[i] = orderTranslate[columnsName[i]];
+                }
+                break;
+            default:
+                break;
+        }
 
         columnsName = columnsName.map((name) => "`" + name + "`");
         data = data.map((value) => `'${value}'`);
@@ -96,7 +174,15 @@ exports.addData = async (req, res) => {
             set +
             ")";
 
-        await db.execute(query, [bufferValue]);
+
+
+        if (bufferValue) {
+
+            await db.execute(query, [bufferValue]);
+        } else {
+            await db.execute(query);
+
+        }
 
         res.sendStatus(200);
 
@@ -125,6 +211,34 @@ exports.changeData = async (req, res) => {
         const { name } = req.params;
 
         let { columnsName, data, field, id } = req.body;
+
+        switch (name) {
+            case "users":
+                field = usersTranslate[field];
+                for (let i = 0; i < columnsName.length; i++) {
+
+                    columnsName[i] = usersTranslate[columnsName[i]];
+                }
+                break;
+            case "Services":
+                field = serviceTranslitiion[field];
+
+                for (let i = 0; i < columnsName.length; i++) {
+
+                    columnsName[i] = serviceTranslitiion[columnsName[i]];
+                }
+                break;
+            case "Order":
+                field = orderTranslate[field];
+
+                for (let i = 0; i < columnsName.length; i++) {
+
+                    columnsName[i] = orderTranslate[columnsName[i]];
+                }
+                break;
+            default:
+                break;
+        }
 
         columnsName = columnsName.map((name) => "`" + name + "`");
         data = data.map((value) => `'${value}'`);
@@ -163,7 +277,13 @@ exports.changeData = async (req, res) => {
             "`" +
             "=" +
             `'${id}'`;
-        await db.execute(query,[bufferValue]);
+        if (bufferValue) {
+
+            await db.execute(query, [bufferValue]);
+        } else {
+            await db.execute(query);
+
+        }
         res.sendStatus(200);
 
         // pool.getConnection((err, connection) => {
@@ -188,7 +308,23 @@ exports.deleteData = async (req, res) => {
     try {
         const { name } = req.params;
 
-        const { field, id } = req.body;
+        let { field, id } = req.body;
+
+        switch (name) {
+            case "users":
+                field = usersTranslate[field];
+
+                break;
+            case "Services":
+                field = serviceTranslitiion[field];
+
+                break;
+            case "Order":
+                field = orderTranslate[field];
+                break;
+            default:
+                break;
+        }
 
         const query =
             "DELETE FROM `" +

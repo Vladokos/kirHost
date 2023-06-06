@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
+  <title>CarService</title>
   <link rel="stylesheet" href="../../css/reset.css">
   <link rel="stylesheet" href="../../css/fonts.css">
   <link rel="stylesheet" href="../../css/table.css">
@@ -18,16 +18,16 @@
         <div class="main_output">
           <ul id="columns">
             {{#each columns as |column|}}
-            <li>{{column}}</li>
+            <li>{{@key}}</li>
             {{/each}}
           </ul>
           {{#each data as |dat|}}
-          <ul class="dataElement" onclick="clickedElement(this,'{{../columns}}')">
+          <ul class="dataElement" onclick="clickedElement(this,'{{search ../columns }}')">
             {{#each ../columns as |column|}}
             {{#ifEquals column "Image"}}
             <li><img src="{{lookup dat (column)}}"></li>
             {{else}}
-            <li>{{lookup dat (column)}}</li>
+            <li style="word-break: break-all;">{{lookup dat (column)}}</li>
             {{/ifEquals }}
 
             {{/each}}
@@ -44,7 +44,7 @@
           </div>
 
           {{else}}
-          {{#ifEquals column.COLUMN_NAME "Image"}}
+          {{#ifEquals column.COLUMN_NAME "Изображение"}}
           <div for="file" class="btn_image" onclick="document.getElementById('{{column.COLUMN_NAME}}').click();">
             <span class="inner_span">Выберите картинку</span>
             <input type="file" id="{{column.COLUMN_NAME}}" style="display:none;" accept="image/*">

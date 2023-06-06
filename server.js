@@ -24,9 +24,19 @@ app.set("view engine", "hbs");
 hbs.registerHelper("ifEquals", (arg1, arg2, options) => {
     if (arg2 === "primaryKey") {
         return (arg1 === options.data.root.primaryKey) ? options.fn(this) : options.inverse(this);
-
     }
     return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+})
+
+hbs.registerHelper("ifMore", (arg1, arg2, options) => {
+    return (arg1 > arg2) ? options.fn(this) : options.inverse(this);
+})
+
+//look inside object and get keys from it
+//return like keyValue1,keyValue2
+hbs.registerHelper("search", (arg1, arg2, options) => {
+    // console.log(Object.keys(arg1).join(","));
+    return Object.keys(arg1)
 })
 
 

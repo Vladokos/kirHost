@@ -6,6 +6,13 @@ const deleteButton = document.getElementById("delete");
 
 let imageFromClicked = "";
 
+function isNumberKey(evt) {
+    var charCode = (evt.which) ? evt.which : evt.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    return true;
+}
+
 const clickedElement = (e, columns) => {
     const fields = columns.split(',');
     // console.log(fields);
@@ -14,13 +21,16 @@ const clickedElement = (e, columns) => {
 
 
     for (let i = 0; i < fields.length; i++) {
-        if (fields[i] === "Image") {
+        if (fields[i] === "Image" || fields[i] === "Изображение") {
             // console.log(e.children[i].firstChild.src);'
             imageFromClicked = e.children[i].firstChild.src
             // document.getElementById(fields[i]).files[0] = e.children[i].firstChild.src;
         } else {
             // console.log(e.children[i].innerText);
-            document.getElementById(fields[i]).value = e.children[i].innerText;
+
+            const input = document.getElementById(fields[i]);
+
+            input.value = e.children[i].innerText;
         }
     }
 }
@@ -34,7 +44,7 @@ saveButton.addEventListener("click", async (e) => {
     const data = [];
 
     for (let i = 0; i < columnsName.length; i++) {
-        if (columnsName[i] === "Image") {
+        if (columnsName[i] === "Image" || columnsName[i] === "Изображение") {
 
             const file = document.getElementById(columnsName[i]).files[0];
 
@@ -68,6 +78,10 @@ saveButton.addEventListener("click", async (e) => {
             alert("Успешно");
             window.location.reload();
         }
+    }).catch((err) => {
+        if(err.response.status === 304){
+            alert("Заполните все поля корректно")
+        }
     })
 })
 
@@ -82,7 +96,7 @@ changeButton.addEventListener("click", async (e) => {
     const data = [];
 
     for (let i = 0; i < columnsName.length; i++) {
-        if (columnsName[i] === "Image") {
+        if (columnsName[i] === "Image" || columnsName[i] === "Изображение") {
             const file = document.getElementById(columnsName[i]).files[0];
 
             console.log(file);
@@ -111,7 +125,7 @@ changeButton.addEventListener("click", async (e) => {
             }
         }
     }
-    
+
     axios.post(`/table/tableChangeData/${tableName}`, {
         columnsName,
         data,
@@ -143,6 +157,10 @@ deleteButton.addEventListener("click", (e) => {
             if (res.status === 200) {
                 alert("Успешно");
                 window.location.reload();
+            }
+        }).catch(err => {
+            if (err.response.status === 304) {
+                alert("Данная запись используется в другой таблице, удаление невозможно")
             }
         })
     } else {
