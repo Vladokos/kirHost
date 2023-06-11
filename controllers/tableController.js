@@ -40,7 +40,7 @@ const serviceTranslitiion = {
 
 const orderTranslate = {
     "Номер заказа": "idOrder",
-    "Номер услуги": "idService",
+    "Услуга": "idService",
     "Номер пользователя": "idUser",
     "Дата": "Date",
 
@@ -51,8 +51,14 @@ exports.selectTableDataColumns = async (req, res) => {
 
         const [columns] = await db.execute("SELECT COLUMN_NAME, COLUMN_KEY, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?", [name]);
 
-        const [data] = await db.execute("SELECT * FROM `" + name + "`");
-
+        let data;
+        let services;
+        if (name === "Order") {
+            [data] = await db.execute("SELECT A.idOrder, A.idUser, concat(A.idService, ' ', B.Title) as idService, A.Date FROM bppppvfgvsskvuc87ysa.Order as A inner join bppppvfgvsskvuc87ysa.Services as B on  A.idService =  B.idServices;");
+            [services] = await db.execute("SELECT * FROM bppppvfgvsskvuc87ysa.Services");
+        } else {
+            [data] = await db.execute("SELECT * FROM `" + name + "`");
+        }
 
         for (let i = 0; i < data.length; i++) {
             if (data[i]?.Image) {
@@ -60,11 +66,19 @@ exports.selectTableDataColumns = async (req, res) => {
             }
             if (data[i]?.Date) {
                 const date = new Date(data[i].Date)
-                const formatted = new Intl.DateTimeFormat('en-US').format(date).split("/").reverse().join("-");
-                data[i].Date = formatted;
+                var culture = new Intl.DateTimeFormat('ru').format(date).split(".").reverse().join("-")
+                // console.log(culture);
+                // const formatted = new Intl.DateTimeFormat('en-US').format(date).split("/").reverse().join("-");
+                data[i].Date = culture;
+            }
+            if (data[i]?.idService) {
+
+                const id = data[i].idService.split(' ')[0];
+                const spltedStr = data[i].idService.split(' ');
+                data[i].idService = spltedStr[1] + " " + spltedStr[2];
+                // Object.assign(data[i],{'idS': id});
             }
         }
-
         let colum = columns.map((column) => column.COLUMN_NAME);
 
         switch (name) {
@@ -91,13 +105,14 @@ exports.selectTableDataColumns = async (req, res) => {
         }
 
         const primaryKey = columns.find((colum) => { if (colum.COLUMN_KEY === 'PRI') { return colum } }).COLUMN_NAME
-        // console.log(colum);
+        // console.log(services);
         res.render("table.hbs", {
             columns: colum,
             columnsDataType: columns,
             data: data,
             tableName: name,
-            primaryKey
+            primaryKey,
+            services
         });
     } catch (error) {
         console.log(error);

@@ -30,7 +30,15 @@ const clickedElement = (e, columns) => {
 
             const input = document.getElementById(fields[i]);
 
-            input.value = e.children[i].innerText;
+            if (input.tagName === "SELECT") {
+                for (let j = 0; j < input.options.length; j++) {
+                    if (input.options[j].innerText === e.children[i].innerText) {
+                        input.selectedIndex = input.options[j].index;
+                    }
+                }
+            } else {
+                input.value = e.children[i].innerText;
+            }
         }
     }
 }
@@ -66,6 +74,10 @@ saveButton.addEventListener("click", async (e) => {
 
             data.push(base64.substring(22));
         } else {
+            if(!document.getElementById(columnsName[i]).value){
+                alert("Заполните все поля корректно")
+                return;
+            }
             data.push(document.getElementById(columnsName[i]).value);
         }
     }

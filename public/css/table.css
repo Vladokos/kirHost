@@ -50,7 +50,7 @@ img{
 .main_output ul{
   display: grid;
   text-align: center;
-  grid-template-columns: repeat(6, 150px);
+  grid-template-columns: repeat(6, 200px);
   margin: 40px 0;
 }
 
